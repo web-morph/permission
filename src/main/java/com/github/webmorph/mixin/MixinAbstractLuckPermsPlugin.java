@@ -70,8 +70,8 @@ public class MixinAbstractLuckPermsPlugin {
     }
 
     @Redirect(method = "testUsernameValidity", at = @At(value = "INVOKE", target = "Ljava/util/function/Predicate;test(Ljava/lang/Object;)Z", ordinal = 0))
-    private boolean redirectLenientTest(Predicate<String> predicate, String username) {
-        return !username.isEmpty();
+    private boolean redirectLenientTest(Predicate<String> predicate, Object username) {
+        return username instanceof String s && !s.isEmpty();
     }
 
     @SneakyThrows
