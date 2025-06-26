@@ -84,6 +84,7 @@ public class MixinAbstractLuckPermsPlugin {
         data.put("database", "permissions");
         if (this.hasMongo()) {
             log.info("Using MongoDB configuration from application.properties");
+            data.put("mongodb-collection-prefix", "permission_");
             data.put("database", props.getProperty("spring.data.mongodb.database", "permissions"));
             root.put("storage-method", "MongoDB");
             data.put("mongodb-connection-uri", props.getProperty("spring.data.mongodb.uri", ""));
