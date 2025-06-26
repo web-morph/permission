@@ -1,6 +1,6 @@
 var javaVersion = 17;
 group = "com.github.webmorph"
-version = "1.0.3"
+version = "1.0.4"
 
 plugins {
     id("java-library")
@@ -34,7 +34,7 @@ dependencies {
     api("com.github.webmorph:logger:1.0.1")
 
     // Permissions
-    api("net.luckperms:standalone:5.5.5")
+    api("net.luckperms:standalone:5.5.6")
 
     // Mixin
     annotationProcessor("net.lenni0451.classtransform:mixinsdummy:1.14.1")

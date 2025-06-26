@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 /**
  * A Mixin that hides luckperms banner, replaces the default configuration directory used by LuckPerms with a
@@ -66,6 +67,11 @@ public class MixinAbstractLuckPermsPlugin {
         this.configPath = Files.createTempDirectory("luckperms_");
         log.info("Moving LuckPerms config to {}/config.yml", this.configPath.toAbsolutePath());
         return this.configPath;
+    }
+
+    @Redirect(method = "testUsernameValidity", at = @At(value = "INVOKE", target = "Ljava/util/function/Predicate;test(Ljava/lang/Object;)Z", ordinal = 0))
+    private boolean redirectLenientTest(Predicate<String> predicate, String username) {
+        return !username.isEmpty();
     }
 
     @SneakyThrows
