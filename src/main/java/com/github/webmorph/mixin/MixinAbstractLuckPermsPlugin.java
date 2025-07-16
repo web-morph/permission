@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 /**
  * A Mixin that hides luckperms banner, replaces the default configuration directory used by LuckPerms with a
@@ -68,6 +69,11 @@ public class MixinAbstractLuckPermsPlugin {
         return this.configPath;
     }
 
+    @Redirect(method = "testUsernameValidity", at = @At(value = "INVOKE", target = "Ljava/util/function/Predicate;test(Ljava/lang/Object;)Z", ordinal = 0))
+    private boolean redirectLenientTest(Predicate<String> predicate, Object username) {
+        return username instanceof String s && !s.isEmpty();
+    }
+
     @SneakyThrows
     @SuppressWarnings("unchecked")
     @Inject(method = "resolveConfig", at = @At(value = "TAIL", shift = At.Shift.BEFORE))
@@ -84,6 +90,7 @@ public class MixinAbstractLuckPermsPlugin {
         data.put("database", "permissions");
         if (this.hasMongo()) {
             log.info("Using MongoDB configuration from application.properties");
+            data.put("mongodb-collection-prefix", "permission_");
             data.put("database", props.getProperty("spring.data.mongodb.database", "permissions"));
             root.put("storage-method", "MongoDB");
             data.put("mongodb-connection-uri", props.getProperty("spring.data.mongodb.uri", ""));
