@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+
+import java.util.Objects;
 
 /**
  * Spring configuration class responsible for bootstrapping LuckPerms in a standalone context
@@ -34,7 +37,8 @@ import org.springframework.core.annotation.Order;
 @ComponentScan("com.github.webmorph.permission")
 public class LuckPermsConfiguration {
     @Bean
-    public LuckPerms getLuckPerms() {
+    public LuckPerms getLuckPerms(EnvironmentProvider provider) {
+        Objects.requireNonNull(provider);
         StandaloneLoader loader = new StandaloneLoader();
         loader.start(new String[0]);
         return ((LuckPermsApiProvider) loader).getLuckPerms();
