@@ -4,20 +4,19 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.github.webmorph.permission.EnvironmentProvider;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.springframework.core.env.Environment;
 
 import java.io.File;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
 import java.util.function.Predicate;
 
 /**
@@ -82,11 +81,7 @@ public class MixinAbstractLuckPermsPlugin {
         Map<String, Object> root = this.mapper.readValue(file, new TypeReference<>() {
         });
         Map<String, Object> data = (Map<String, Object>) root.get("data");
-        InputStream inputStream = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("application.properties"));
-        Properties props = new Properties();
-        props.load(inputStream);
-        inputStream.close();
+        Environment props = EnvironmentProvider.getInstance();
         data.put("database", "permissions");
         if (this.hasMongo()) {
             log.info("Using MongoDB configuration from application.properties");
@@ -144,19 +139,19 @@ public class MixinAbstractLuckPermsPlugin {
         return hasClass("org.springframework.data.mongodb.SpringDataMongoDB");
     }
 
-    private boolean hasMariaDB(Properties props) {
+    private boolean hasMariaDB(Environment props) {
         return this.hasDriver("org.mariadb.jdbc.Driver", props);
     }
 
-    private boolean hasPostgreSQL(Properties props) {
+    private boolean hasPostgreSQL(Environment props) {
         return this.hasDriver("org.postgresql.Driver", props);
     }
 
-    private boolean hasMySQL(Properties props) {
+    private boolean hasMySQL(Environment props) {
         return this.hasDriver("com.mysql.jdbc.Driver", props) || this.hasDriver("com.mysql.cj.jdbc.Driver", props);
     }
 
-    private boolean hasDriver(String driver, Properties props) {
+    private boolean hasDriver(String driver, Environment props) {
         return hasClass(driver) && driver.equals(props.getProperty("spring.datasource.driver-class-name"));
     }
 }
